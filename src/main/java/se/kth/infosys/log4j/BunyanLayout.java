@@ -42,6 +42,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+/**
+ * A Log4j 1.2 Layout which prints events in Node Bunyan JSON format.
+ * The layout takes no options and requires no additional configuration.
+ */
 public class BunyanLayout extends Layout {
 	private static final Map<Level, Integer> BANYAN_LEVEL;
 	static {
@@ -101,16 +105,23 @@ public class BunyanLayout extends Layout {
 	}
 
 	/**
-	 * The throwable object is rendered in the output.
+	 * The throwable object is rendered in the output as an "err" property.
 	 */
 	public boolean ignoresThrowable() {
 		return false;
 	}
 
+	/**
+	 * This Layout renders JSON objects, hence we use application/json.
+	 * This is in a strict sense untrue, since the entire stream is not proper JSON.
+	 */
 	@Override
 	public String getContentType() {
 		return "application/json";
 	}
 
+	/**
+	 * No options, hence doing nothing.
+	 */
 	public void activateOptions() {}
 }
