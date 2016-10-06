@@ -59,7 +59,7 @@ public class BunyanLayout extends Layout {
 	}
 
 	private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	static {
 		DATE_FORMAT.setTimeZone(TZ);
 	}
