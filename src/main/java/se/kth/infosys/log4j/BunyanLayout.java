@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-public class BanyanLayout extends Layout {
+public class BunyanLayout extends Layout {
 	private static final Map<Level, Integer> BANYAN_LEVEL;
 	static {
 		BANYAN_LEVEL = new HashMap<Level, Integer>();

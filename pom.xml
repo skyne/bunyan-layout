@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>se.kth.infosys.log4j</groupId>
-  <artifactId>banyan-layout</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <artifactId>bunyan-layout</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>banyan-layout</name>
-  <description>A Log4j layout for banyan-like JSON formatted output</description>
+  <name>bunyan-layout</name>
+  <description>A Log4j layout for bunyan-like JSON formatted output</description>
   <url>http://www.kth.se</url>
 
   <properties>
