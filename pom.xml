@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>se.kth.infosys.log4j</groupId>
+  <artifactId>banyan-layout</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>banyan-layout</name>
+  <description>A Log4j layout for banyan-like JSON formatted output</description>
+  <url>http://www.kth.se</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <log4j-version>1.2.17</log4j-version>
+  </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>fjo.ite.kth.se</id>
+      <name>infosys-local</name>
+      <url>https://fjo.ite.kth.se/artifactory/infosys-local/</url>
+    </repository>
+  </distributionManagement>
+  
+  <repositories>
+    <repository>
+      <id>infosys-local</id>
+      <name>infosys-local</name>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+      <url>https://fjo.ite.kth.se/artifactory/infosys-local</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.7</version>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration/>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>3.0.1</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Embed-Dependency>httpcore,httpclient,ugclient,commons-logging,json</Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Import-Package>!org.apache.log,*</Import-Package>
+            <Export-Package>se.kth.infosys.camel.ug.model</Export-Package>
+            <Export-Service>org.apache.camel.spi.ComponentResolver;component=ug</Export-Service>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
