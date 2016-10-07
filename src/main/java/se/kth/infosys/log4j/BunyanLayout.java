@@ -59,7 +59,7 @@ public class BunyanLayout extends Layout {
 	}
 
 	private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	static {
 		DATE_FORMAT.setTimeZone(TZ);
 	}
@@ -73,7 +73,7 @@ public class BunyanLayout extends Layout {
 		jsonEvent.addProperty("v", 0);
 		jsonEvent.addProperty("level", BANYAN_LEVEL.get(event.getLevel()));
 		jsonEvent.addProperty("levelStr", event.getLevel().toString());
-		jsonEvent.addProperty("logger", event.getLoggerName());
+		jsonEvent.addProperty("name", event.getLoggerName());
 		try {
 			jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
 		} catch (UnknownHostException e) {
