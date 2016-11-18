@@ -8,14 +8,24 @@ See: https://github.com/trentm/node-bunyan
 1. "pid" is the thread name as a string rather than an integer for the process id.
 1. "levelStr" is added with a string representation of the log level in addition to the "level" field.
 
-## Usage
+## Usage with Maven
+
+```
+<dependency>
+    <groupId>se.kth.infosys.log4j</groupId>
+    <artifactId>bunyan-layout</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+## Configuration
 
 Extremely simple, make sure jar is in classpath and add the layout class to the log4j configuration.
 There are no options.
 
 ```
 # log4j.properties
-
+log4j.rootLogger=INFO, out
 ...
 log4j.appender.out.layout=se.kth.infosys.log4j.BunyanLayout
 ```
