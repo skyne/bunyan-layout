@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Appenders>
+    <Console name="stdout" target="SYSTEM_OUT">
+      <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="ACCEPT"/>
+      <BunyanLayout />
+    </Console>
+
+    <Console name="stderr" target="SYSTEM_ERR">
+      <ThresholdFilter level="WARN"/>
+      <BunyanLayout/>
+    </Console>
+
+    <RollingFile name="file" fileName="file.log" filePattern="file.log.%i">
+      <SizeBasedTriggeringPolicy size="10MB"/>
+      <DefaultRolloverStrategy max="10"/>
+      <PatternLayout pattern="%d | %-5p | %.30c | %m | %t%n"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Logger name="se.kth.infosys" level="DEBUG"/>
+
+    <Root level="WARN">
+      <AppenderRef ref="stdout"/>
+      <AppenderRef ref="stderr"/>
+      <AppenderRef ref="file"/>
+    </Root>
+  </Loggers>
+</Configuration>

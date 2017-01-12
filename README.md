@@ -1,6 +1,6 @@
 # bunyan-layout
 
-A very simple log4j 1.2 Layout to log events formatted in the Bunyan JSON format.
+A very simple log4j 2.x Layout to log events formatted in the Bunyan JSON format.
 See: https://github.com/trentm/node-bunyan
 
 ### Notable differences to the node-bunyan JSON:
@@ -12,20 +12,21 @@ See: https://github.com/trentm/node-bunyan
 
 ```
 <dependency>
-    <groupId>se.kth.infosys.log4j</groupId>
+    <groupId>se.kth.infosys.log4j2</groupId>
     <artifactId>bunyan-layout</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
 ## Configuration
 
-Extremely simple, make sure jar is in classpath and add the layout class to the log4j configuration.
+Extremely simple, make sure jar is in classpath and add the layout class to the log4j2 configuration.
 There are no options.
 
 ```
-# log4j.properties
-log4j.rootLogger=INFO, out
+# log4j2.xml
 ...
-log4j.appender.out.layout=se.kth.infosys.log4j.BunyanLayout
+<Console name="stdout" target="SYSTEM_OUT">
+  <BunyanLayout/>
+</Console>
 ```

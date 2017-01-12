@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,9 +35,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.layout.AbstractStringLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,16 +50,29 @@ import com.google.gson.JsonObject;
  * A Log4j 1.2 Layout which prints events in Node Bunyan JSON format.
  * The layout takes no options and requires no additional configuration.
  */
-public class BunyanLayout extends Layout {
-	private static final Map<Level, Integer> BANYAN_LEVEL;
+@Plugin(name = "BunyanLayout", category = "Core", elementType = "layout", printObject = true)
+public class BunyanLayout extends AbstractStringLayout {
+	protected BunyanLayout(Charset charset) {
+		super(charset);
+	}
+
+	@PluginFactory
+    public static BunyanLayout createLayout(@PluginAttribute("locationInfo") boolean locationInfo,
+                                            @PluginAttribute("properties") boolean properties,
+                                            @PluginAttribute("complete") boolean complete,
+                                            @PluginAttribute(value = "charset", defaultString = "UTF-8") Charset charset) {
+        return new BunyanLayout(charset);
+    }
+	
+	private static final Map<Level, Integer> BUNYAN_LEVEL;
 	static {
-		BANYAN_LEVEL = new HashMap<Level, Integer>();
-		BANYAN_LEVEL.put(Level.FATAL, 60);
-		BANYAN_LEVEL.put(Level.ERROR, 50);
-		BANYAN_LEVEL.put(Level.WARN, 40);
-		BANYAN_LEVEL.put(Level.INFO, 30);
-		BANYAN_LEVEL.put(Level.DEBUG, 20);
-		BANYAN_LEVEL.put(Level.TRACE, 10);
+		BUNYAN_LEVEL = new HashMap<Level, Integer>();
+		BUNYAN_LEVEL.put(Level.FATAL, 60);
+		BUNYAN_LEVEL.put(Level.ERROR, 50);
+		BUNYAN_LEVEL.put(Level.WARN, 40);
+		BUNYAN_LEVEL.put(Level.INFO, 30);
+		BUNYAN_LEVEL.put(Level.DEBUG, 20);
+		BUNYAN_LEVEL.put(Level.TRACE, 10);
 	}
 
 	private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
@@ -66,12 +83,12 @@ public class BunyanLayout extends Layout {
 	private static final Gson GSON = new GsonBuilder().create();
 	
 	/**
-	 * Format the event as a Banyan style JSON object.
+	 * Format the event as a Bunyan style JSON object.
 	 */
-	public String format(LoggingEvent event) {
+	private String format(LogEvent event) {
 		JsonObject jsonEvent = new JsonObject();
 		jsonEvent.addProperty("v", 0);
-		jsonEvent.addProperty("level", BANYAN_LEVEL.get(event.getLevel()));
+		jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
 		jsonEvent.addProperty("levelStr", event.getLevel().toString());
 		jsonEvent.addProperty("name", event.getLoggerName());
 		try {
@@ -80,13 +97,13 @@ public class BunyanLayout extends Layout {
 			jsonEvent.addProperty("hostname", "unkown");
 		}
 		jsonEvent.addProperty("pid", event.getThreadName());
-		jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
-		jsonEvent.addProperty("msg", event.getMessage().toString());
-		jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
+		jsonEvent.addProperty("time", getTime(event.getTimeMillis()));
+		jsonEvent.addProperty("msg", event.getMessage().getFormattedMessage());
+		jsonEvent.addProperty("src", event.getSource().getClassName());
 
-		if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableInformation() != null) {
+		if (event.getLevel().isMoreSpecificThan(Level.WARN) && event.getThrown() != null) {
 			JsonObject jsonError = new JsonObject();
-			Throwable e = event.getThrowableInformation().getThrowable();
+			Throwable e = event.getThrown();
 			
 			jsonError.addProperty("message", e.getMessage());
 			jsonError.addProperty("name", e.getClass().getSimpleName());
@@ -105,13 +122,6 @@ public class BunyanLayout extends Layout {
 	}
 
 	/**
-	 * The throwable object is rendered in the output as an "err" property.
-	 */
-	public boolean ignoresThrowable() {
-		return false;
-	}
-
-	/**
 	 * This Layout renders JSON objects, hence we use application/json.
 	 * This is in a strict sense untrue, since the entire stream is not proper JSON.
 	 */
@@ -121,7 +131,18 @@ public class BunyanLayout extends Layout {
 	}
 
 	/**
-	 * No options, hence doing nothing.
+	 * {@inheritDoc} 
 	 */
-	public void activateOptions() {}
+	@Override
+	public byte[] toByteArray(LogEvent event) {
+		return format(event).getBytes();
+	}
+
+	/**
+	 * {@inheritDoc} 
+	 */
+	@Override
+	public String toSerializable(LogEvent event) {
+		return format(event);	
+	}
 }
