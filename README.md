@@ -5,7 +5,7 @@ See: https://github.com/trentm/node-bunyan
 
 ### Notable differences to the node-bunyan JSON:
 
-1. "pid" is the thread name as a string rather than an integer for the process id.
+1. "pid" is the thread id as a long integer rather than the JVM process id.
 1. "levelStr" is added with a string representation of the log level in addition to the "level" field.
 
 ## Usage with Maven
