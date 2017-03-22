@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016 Kungliga Tekniska högskolan
+ * Copyright (c) 2017 Kungliga Tekniska högskolan
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,97 +52,97 @@ import com.google.gson.JsonObject;
  */
 @Plugin(name = "BunyanLayout", category = "Core", elementType = "layout", printObject = true)
 public class BunyanLayout extends AbstractStringLayout {
-	protected BunyanLayout(Charset charset) {
-		super(charset);
-	}
+    protected BunyanLayout(Charset charset) {
+        super(charset);
+    }
 
-	@PluginFactory
+    @PluginFactory
     public static BunyanLayout createLayout(@PluginAttribute("locationInfo") boolean locationInfo,
-                                            @PluginAttribute("properties") boolean properties,
-                                            @PluginAttribute("complete") boolean complete,
-                                            @PluginAttribute(value = "charset", defaultString = "UTF-8") Charset charset) {
+            @PluginAttribute("properties") boolean properties,
+            @PluginAttribute("complete") boolean complete,
+            @PluginAttribute(value = "charset", defaultString = "UTF-8") Charset charset) {
         return new BunyanLayout(charset);
     }
-	
-	private static final Map<Level, Integer> BUNYAN_LEVEL;
-	static {
-		BUNYAN_LEVEL = new HashMap<Level, Integer>();
-		BUNYAN_LEVEL.put(Level.FATAL, 60);
-		BUNYAN_LEVEL.put(Level.ERROR, 50);
-		BUNYAN_LEVEL.put(Level.WARN, 40);
-		BUNYAN_LEVEL.put(Level.INFO, 30);
-		BUNYAN_LEVEL.put(Level.DEBUG, 20);
-		BUNYAN_LEVEL.put(Level.TRACE, 10);
-	}
 
-	private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-	static {
-		DATE_FORMAT.setTimeZone(TZ);
-	}
-	private static final Gson GSON = new GsonBuilder().create();
-	
-	/**
-	 * Format the event as a Bunyan style JSON object.
-	 */
-	private String format(LogEvent event) {
-		JsonObject jsonEvent = new JsonObject();
-		jsonEvent.addProperty("v", 0);
-		jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
-		jsonEvent.addProperty("levelStr", event.getLevel().toString());
-		jsonEvent.addProperty("name", event.getLoggerName());
-		try {
-			jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
-		} catch (UnknownHostException e) {
-			jsonEvent.addProperty("hostname", "unkown");
-		}
-		jsonEvent.addProperty("pid", event.getThreadName());
-		jsonEvent.addProperty("time", getTime(event.getTimeMillis()));
-		jsonEvent.addProperty("msg", event.getMessage().getFormattedMessage());
-		jsonEvent.addProperty("src", event.getSource().getClassName());
+    private static final Map<Level, Integer> BUNYAN_LEVEL;
+    static {
+        BUNYAN_LEVEL = new HashMap<Level, Integer>();
+        BUNYAN_LEVEL.put(Level.FATAL, 60);
+        BUNYAN_LEVEL.put(Level.ERROR, 50);
+        BUNYAN_LEVEL.put(Level.WARN, 40);
+        BUNYAN_LEVEL.put(Level.INFO, 30);
+        BUNYAN_LEVEL.put(Level.DEBUG, 20);
+        BUNYAN_LEVEL.put(Level.TRACE, 10);
+    }
 
-		if (event.getLevel().isMoreSpecificThan(Level.WARN) && event.getThrown() != null) {
-			JsonObject jsonError = new JsonObject();
-			Throwable e = event.getThrown();
-			
-			jsonError.addProperty("message", e.getMessage());
-			jsonError.addProperty("name", e.getClass().getSimpleName());
-			
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			jsonError.addProperty("stack", sw.toString());
-			jsonEvent.add("err", jsonError);
-		}
-		return GSON.toJson(jsonEvent) + "\n";
-	}
-	
-	private String getTime(long timeStamp) {
-		return DATE_FORMAT.format(new Date(timeStamp));
-	}
+    private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    static {
+        DATE_FORMAT.setTimeZone(TZ);
+    }
+    private static final Gson GSON = new GsonBuilder().create();
 
-	/**
-	 * This Layout renders JSON objects, hence we use application/json.
-	 * This is in a strict sense untrue, since the entire stream is not proper JSON.
-	 */
-	@Override
-	public String getContentType() {
-		return "application/json";
-	}
+    /**
+     * Format the event as a Bunyan style JSON object.
+     */
+    private String format(LogEvent event) {
+        JsonObject jsonEvent = new JsonObject();
+        jsonEvent.addProperty("v", 0);
+        jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
+        jsonEvent.addProperty("levelStr", event.getLevel().toString());
+        jsonEvent.addProperty("name", event.getLoggerName());
+        try {
+            jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            jsonEvent.addProperty("hostname", "unkown");
+        }
+        jsonEvent.addProperty("pid", event.getThreadId());
+        jsonEvent.addProperty("time", getTime(event.getTimeMillis()));
+        jsonEvent.addProperty("msg", event.getMessage().getFormattedMessage());
+        jsonEvent.addProperty("src", event.getSource().getClassName());
 
-	/**
-	 * {@inheritDoc} 
-	 */
-	@Override
-	public byte[] toByteArray(LogEvent event) {
-		return format(event).getBytes();
-	}
+        if (event.getLevel().isMoreSpecificThan(Level.WARN) && event.getThrown() != null) {
+            JsonObject jsonError = new JsonObject();
+            Throwable e = event.getThrown();
 
-	/**
-	 * {@inheritDoc} 
-	 */
-	@Override
-	public String toSerializable(LogEvent event) {
-		return format(event);	
-	}
+            jsonError.addProperty("message", e.getMessage());
+            jsonError.addProperty("name", e.getClass().getSimpleName());
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            jsonError.addProperty("stack", sw.toString());
+            jsonEvent.add("err", jsonError);
+        }
+        return GSON.toJson(jsonEvent) + "\n";
+    }
+
+    private String getTime(long timeStamp) {
+        return DATE_FORMAT.format(new Date(timeStamp));
+    }
+
+    /**
+     * This Layout renders JSON objects, hence we use application/json.
+     * This is in a strict sense untrue, since the entire stream is not proper JSON.
+     */
+    @Override
+    public String getContentType() {
+        return "application/json";
+    }
+
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
+    public byte[] toByteArray(LogEvent event) {
+        return format(event).getBytes();
+    }
+
+    /**
+     * {@inheritDoc} 
+     */
+    @Override
+    public String toSerializable(LogEvent event) {
+        return format(event);	
+    }
 }
