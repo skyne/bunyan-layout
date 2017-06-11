@@ -14,7 +14,7 @@ See: https://github.com/trentm/node-bunyan
 <dependency>
     <groupId>se.kth.infosys.log4j2</groupId>
     <artifactId>bunyan-layout</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
