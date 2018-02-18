@@ -2,7 +2,7 @@
 <!--
   MIT License
 
-  Copyright (c) 2017 Kungliga Tekniska högskolan
+  Copyright (c) 2018 Kungliga Tekniska högskolan
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -44,18 +44,4 @@
       <version>${log4j-version}</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
