@@ -8,6 +8,8 @@ See [parent project](../README.md) for other log frameworks.
 
 ## Configuration
 
+### Maven dependency
+
 ```
   <dependency>
     <groupId>se.kth.infosys.logging</groupId>
