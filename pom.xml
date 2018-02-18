@@ -28,7 +28,7 @@
 
   <groupId>se.kth.infosys</groupId>
   <artifactId>bunyan-logging</artifactId>
-  <version>2.1.0</version>
+  <version>2.2.0</version>
   <packaging>pom</packaging>
 
   <name>Bunyan log tools</name>
@@ -40,6 +40,7 @@
     <module>log4j2-bunyan</module>
     <module>log4j-bunyan</module>
     <module>java-logging-bunyan</module>
+    <module>logback-bunyan</module>
   </modules>
 
   <properties>
