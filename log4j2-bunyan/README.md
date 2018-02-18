@@ -3,6 +3,8 @@
 A very simple log4j 2.x Layout to log events formatted in the Bunyan JSON format.
 See: https://github.com/trentm/node-bunyan. There are no configuration options.
 
+See (parent project)[../] for other log frameworks.
+
 ### Notable differences to the node-bunyan JSON:
 
 1. "pid" is the thread id as a long integer rather than the JVM process id.
@@ -18,7 +20,7 @@ Maven dependency:
 <dependency>
     <groupId>se.kth.infosys.log4j2</groupId>
     <artifactId>bunyan-layout</artifactId>
-    <version>2.0.1</version>
+    <version>x.y.z</version>
 </dependency>
 ```
 
@@ -41,34 +43,4 @@ using the layout:
     </Root>
   </Loggers>
 </Configuration>
-```
-
-### Log4j
-
-Maven dependency:
-
-```
-<dependency>
-    <groupId>se.kth.infosys.log4j</groupId>
-    <artifactId>bunyan-layout</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
-
-XML-style configuration.
-
-```
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-
-<log4j:configuration debug="false" xmlns:log4j="http://jakarta.apache.org/log4j/">
-    <appender name="console" class="org.apache.log4j.ConsoleAppender">
-        <layout class="se.kth.infosys.log4j.BunyanLayout"/>
-    </appender>
-
-    <root>
-        <level value="ERROR" />
-        <appender-ref ref="console" />
-    </root>
-</log4j:configuration>
 ```
