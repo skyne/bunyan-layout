@@ -13,8 +13,7 @@ in various logging frameworks for Java.
 The project uses git-flow branch strategy, see
 [introduction](http://nvie.com/posts/a-successful-git-branching-model/)
 and the [git-flow tool](https://github.com/nvie/gitflow). Mainly all
-development goes into development branch and via releases into master
-which is built and pushed to docker hub continously by Jenkins.
+development goes into development branch and via releases into master.
 
 ### Building
 
