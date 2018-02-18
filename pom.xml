@@ -2,19 +2,41 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.kth.infosys.log4j2</groupId>
-  <artifactId>bunyan-layout</artifactId>
-  <version>2.0.1</version>
-  <packaging>jar</packaging>
+  <groupId>se.kth.infosys</groupId>
+  <artifactId>bunyan-logging</artifactId>
+  <version>2.0.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>bunyan-layout</name>
-  <description>A Log4j layout for bunyan-like JSON formatted output</description>
+  <name>Bunyan log tools</name>
+  <description>Support for logging to Bunyan JSON format for some log frameworks</description>
   <url>http://www.kth.se</url>
+
+  <modules>
+<!--     <module>java-logging-bunyan</module> -->
+    <module>log4j2-bunyan</module>
+    <module>log4j-bunyan</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <log4j-version>2.6.2</log4j-version>
+    <log4j2-version>2.6.2</log4j2-version>
+    <log4j-version>1.2.17</log4j-version>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <!-- License information required by Sonatype -->
   <licenses>
@@ -52,27 +74,47 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.7</version>
-    </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  
+  <profiles>
+    <profile>
+      <id>release</id>
+
+      <build>
+        <defaultGoal>clean deploy</defaultGoal>
+        <plugins>
+          <!-- Sonatype release plugin -->
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+               <serverId>ossrh</serverId>
+               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+               <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+
+          <!-- Signing required by Sonatype -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
       <!-- Source required by Sonatype -->
@@ -89,6 +131,7 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- Javadoc required by Sonatype -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -104,50 +147,12 @@
         </executions>
         <configuration/>
       </plugin>
-      <!-- Signing required by Sonatype -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
         <version>2.2</version>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-        <executions>
-          <execution>
-            <id>log4j-plugin-processor</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <phase>process-classes</phase>
-            <configuration>
-              <proc>only</proc>
-              <annotationProcessors>
-                <annotationProcessor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</annotationProcessor>
-              </annotationProcessors>
-            </configuration>
-          </execution>
-        </executions>
-        </plugin>
     </plugins>
   </build>
 </project>
