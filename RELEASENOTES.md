@@ -1,5 +1,7 @@
 # Releasenotes
 
-## 1.0.0
+## 2.1.0
 
-Initial release.
+New release where former bunyan-layout for log4j and log4j2 are built as
+separate sub modules and java-logging-bunyan is added as an additional
+module.
