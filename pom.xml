@@ -40,6 +40,7 @@
     <module>log4j2-bunyan</module>
     <module>log4j-bunyan</module>
     <module>java-logging-bunyan</module>
+    <module>logback-bunyan</module>
   </modules>
 
   <properties>
