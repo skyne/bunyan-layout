@@ -47,81 +47,81 @@ import com.google.gson.JsonObject;
  * The layout takes no options and requires no additional configuration.
  */
 public class BunyanLayout extends Layout {
-	private static final Map<Level, Integer> BANYAN_LEVEL;
-	static {
-		BANYAN_LEVEL = new HashMap<Level, Integer>();
-		BANYAN_LEVEL.put(Level.FATAL, 60);
-		BANYAN_LEVEL.put(Level.ERROR, 50);
-		BANYAN_LEVEL.put(Level.WARN, 40);
-		BANYAN_LEVEL.put(Level.INFO, 30);
-		BANYAN_LEVEL.put(Level.DEBUG, 20);
-		BANYAN_LEVEL.put(Level.TRACE, 10);
-	}
+    private static final Map<Level, Integer> BUNYAN_LEVEL;
+    static {
+        BUNYAN_LEVEL = new HashMap<Level, Integer>();
+        BUNYAN_LEVEL.put(Level.FATAL, 60);
+        BUNYAN_LEVEL.put(Level.ERROR, 50);
+        BUNYAN_LEVEL.put(Level.WARN, 40);
+        BUNYAN_LEVEL.put(Level.INFO, 30);
+        BUNYAN_LEVEL.put(Level.DEBUG, 20);
+        BUNYAN_LEVEL.put(Level.TRACE, 10);
+    }
 
-	private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-	static {
-		DATE_FORMAT.setTimeZone(TZ);
-	}
-	private static final Gson GSON = new GsonBuilder().create();
-	
-	/**
-	 * Format the event as a Banyan style JSON object.
-	 */
-	public String format(LoggingEvent event) {
-		JsonObject jsonEvent = new JsonObject();
-		jsonEvent.addProperty("v", 0);
-		jsonEvent.addProperty("level", BANYAN_LEVEL.get(event.getLevel()));
-		jsonEvent.addProperty("levelStr", event.getLevel().toString());
-		jsonEvent.addProperty("name", event.getLoggerName());
-		try {
-			jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
-		} catch (UnknownHostException e) {
-			jsonEvent.addProperty("hostname", "unkown");
-		}
-		jsonEvent.addProperty("pid", event.getThreadName());
-		jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
-		jsonEvent.addProperty("msg", event.getMessage().toString());
-		jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
+    private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    static {
+        DATE_FORMAT.setTimeZone(TZ);
+    }
+    private static final Gson GSON = new GsonBuilder().create();
 
-		if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableInformation() != null) {
-			JsonObject jsonError = new JsonObject();
-			Throwable e = event.getThrowableInformation().getThrowable();
-			
-			jsonError.addProperty("message", e.getMessage());
-			jsonError.addProperty("name", e.getClass().getSimpleName());
-			
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			jsonError.addProperty("stack", sw.toString());
-			jsonEvent.add("err", jsonError);
-		}
-		return GSON.toJson(jsonEvent) + "\n";
-	}
-	
-	private String getTime(long timeStamp) {
-		return DATE_FORMAT.format(new Date(timeStamp));
-	}
+    /**
+     * Format the event as a Banyan style JSON object.
+     */
+    public String format(LoggingEvent event) {
+        JsonObject jsonEvent = new JsonObject();
+        jsonEvent.addProperty("v", 0);
+        jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
+        jsonEvent.addProperty("levelStr", event.getLevel().toString());
+        jsonEvent.addProperty("name", event.getLoggerName());
+        try {
+            jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            jsonEvent.addProperty("hostname", "unkown");
+        }
+        jsonEvent.addProperty("pid", event.getThreadName());
+        jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
+        jsonEvent.addProperty("msg", event.getMessage().toString());
+        jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
 
-	/**
-	 * The throwable object is rendered in the output as an "err" property.
-	 */
-	public boolean ignoresThrowable() {
-		return false;
-	}
+        if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableInformation() != null) {
+            JsonObject jsonError = new JsonObject();
+            Throwable e = event.getThrowableInformation().getThrowable();
 
-	/**
-	 * This Layout renders JSON objects, hence we use application/json.
-	 * This is in a strict sense untrue, since the entire stream is not proper JSON.
-	 */
-	@Override
-	public String getContentType() {
-		return "application/json";
-	}
+            jsonError.addProperty("message", e.getMessage());
+            jsonError.addProperty("name", e.getClass().getSimpleName());
 
-	/**
-	 * No options, hence doing nothing.
-	 */
-	public void activateOptions() {}
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            jsonError.addProperty("stack", sw.toString());
+            jsonEvent.add("err", jsonError);
+        }
+        return GSON.toJson(jsonEvent) + "\n";
+    }
+
+    private String getTime(long timeStamp) {
+        return DATE_FORMAT.format(new Date(timeStamp));
+    }
+
+    /**
+     * The throwable object is rendered in the output as an "err" property.
+     */
+    public boolean ignoresThrowable() {
+        return false;
+    }
+
+    /**
+     * This Layout renders JSON objects, hence we use application/json.
+     * This is in a strict sense untrue, since the entire stream is not proper JSON.
+     */
+    @Override
+    public String getContentType() {
+        return "application/json";
+    }
+
+    /**
+     * No options, hence doing nothing.
+     */
+    public void activateOptions() {}
 }
