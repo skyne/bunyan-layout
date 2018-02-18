@@ -1,7 +1,8 @@
-/bin/
-/target/
+bin/
+target/
 *~
-/.settings
-/.classpath
-/pom.xml.versionsBackup
+.settings
+.classpath
+pom.xml.versionsBackup
+dependency-reduced-pom.xml
 file.log
