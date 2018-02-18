@@ -3,7 +3,7 @@
 A very simple log4j 1.4.x Layout to log events formatted in the Bunyan JSON format.
 See: https://github.com/trentm/node-bunyan. There are no configuration options.
 
-See (parent project)[../] for other log frameworks.
+See [parent project](../) for other log frameworks.
 
 ### Notable differences to the node-bunyan JSON:
 
