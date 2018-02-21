@@ -54,7 +54,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         }
         jsonEvent.addProperty("pid", event.getThreadName());
         jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
-        jsonEvent.addProperty("msg", event.getMessage().toString());
+        jsonEvent.addProperty("msg", event.getFormattedMessage());
 
         if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableProxy() != null) {
             JsonObject jsonError = new JsonObject();
