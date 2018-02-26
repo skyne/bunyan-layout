@@ -1,6 +1,7 @@
 # bunyan-layout
 
-Tools for logging in Bunyan format in various logging frameworks.
+Tools for logging in Bunyan JSON format (see See: https://github.com/trentm/node-bunyan)
+in various logging frameworks for Java.
 
 * [log4j2-bunyan](log4j2-bunyan/) - Log4j 2.x log layout.
 * [log4j-bunyan](log4j-bunyan/) - Log4j 1.4.x log layout. 
@@ -12,8 +13,7 @@ Tools for logging in Bunyan format in various logging frameworks.
 The project uses git-flow branch strategy, see
 [introduction](http://nvie.com/posts/a-successful-git-branching-model/)
 and the [git-flow tool](https://github.com/nvie/gitflow). Mainly all
-development goes into development branch and via releases into master
-which is built and pushed to docker hub continously by Jenkins.
+development goes into development branch and via releases into master.
 
 ### Building
 

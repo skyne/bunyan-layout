@@ -27,12 +27,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -49,7 +49,7 @@ import com.google.gson.JsonObject;
 public class BunyanLayout extends Layout {
     private static final Map<Level, Integer> BUNYAN_LEVEL;
     static {
-        BUNYAN_LEVEL = new HashMap<Level, Integer>();
+        BUNYAN_LEVEL = new HashMap<>();
         BUNYAN_LEVEL.put(Level.FATAL, 60);
         BUNYAN_LEVEL.put(Level.ERROR, 50);
         BUNYAN_LEVEL.put(Level.WARN, 40);
@@ -58,11 +58,6 @@ public class BunyanLayout extends Layout {
         BUNYAN_LEVEL.put(Level.TRACE, 10);
     }
 
-    private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static {
-        DATE_FORMAT.setTimeZone(TZ);
-    }
     private static final Gson GSON = new GsonBuilder().create();
 
     /**
@@ -80,7 +75,7 @@ public class BunyanLayout extends Layout {
             jsonEvent.addProperty("hostname", "unkown");
         }
         jsonEvent.addProperty("pid", event.getThreadName());
-        jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
+        jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeStamp()));
         jsonEvent.addProperty("msg", event.getMessage().toString());
         jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
 
@@ -100,8 +95,10 @@ public class BunyanLayout extends Layout {
         return GSON.toJson(jsonEvent) + "\n";
     }
 
-    private String getTime(long timeStamp) {
-        return DATE_FORMAT.format(new Date(timeStamp));
+    private static String formatAsIsoUTCDateTime(long timeStamp) {
+        final Instant instant = Instant.ofEpochMilli(timeStamp);
+        return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_INSTANT);
     }
 
     /**
