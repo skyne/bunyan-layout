@@ -27,10 +27,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Formatter;
@@ -75,8 +76,8 @@ public class BunyanFormatter extends Formatter {
     }
 
     private static String formatAsIsoUTCDateTime(long timeStamp) {
-        final Date date = new Date(timeStamp);
-        return ZonedDateTime.ofInstant(date.toInstant(), SYSTEM_ZONE)
+        final Instant instant = Instant.ofEpochMilli(timeStamp);
+        return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
                 .format(DateTimeFormatter.ISO_INSTANT);
     }
 

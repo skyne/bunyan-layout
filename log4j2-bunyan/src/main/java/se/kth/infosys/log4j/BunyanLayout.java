@@ -28,12 +28,12 @@ import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -66,7 +66,7 @@ public class BunyanLayout extends AbstractStringLayout {
 
     private static final Map<Level, Integer> BUNYAN_LEVEL;
     static {
-        BUNYAN_LEVEL = new HashMap<Level, Integer>();
+        BUNYAN_LEVEL = new HashMap<>();
         BUNYAN_LEVEL.put(Level.FATAL, 60);
         BUNYAN_LEVEL.put(Level.ERROR, 50);
         BUNYAN_LEVEL.put(Level.WARN, 40);
@@ -75,11 +75,6 @@ public class BunyanLayout extends AbstractStringLayout {
         BUNYAN_LEVEL.put(Level.TRACE, 10);
     }
 
-    private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static {
-        DATE_FORMAT.setTimeZone(TZ);
-    }
     private static final Gson GSON = new GsonBuilder().create();
 
     /**
@@ -97,7 +92,7 @@ public class BunyanLayout extends AbstractStringLayout {
             jsonEvent.addProperty("hostname", "unkown");
         }
         jsonEvent.addProperty("pid", event.getThreadId());
-        jsonEvent.addProperty("time", getTime(event.getTimeMillis()));
+        jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeMillis()));
         jsonEvent.addProperty("msg", event.getMessage().getFormattedMessage());
         jsonEvent.addProperty("src", event.getSource().getClassName());
 
@@ -117,8 +112,10 @@ public class BunyanLayout extends AbstractStringLayout {
         return GSON.toJson(jsonEvent) + "\n";
     }
 
-    private String getTime(long timeStamp) {
-        return DATE_FORMAT.format(new Date(timeStamp));
+    private static String formatAsIsoUTCDateTime(long timeStamp) {
+        final Instant instant = Instant.ofEpochMilli(timeStamp);
+        return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_INSTANT);
     }
 
     /**
@@ -131,7 +128,7 @@ public class BunyanLayout extends AbstractStringLayout {
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     public byte[] toByteArray(LogEvent event) {
@@ -139,10 +136,10 @@ public class BunyanLayout extends AbstractStringLayout {
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     public String toSerializable(LogEvent event) {
-        return format(event);	
+        return format(event);
     }
 }
