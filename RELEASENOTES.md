@@ -1,6 +1,10 @@
 # Releasenotes
 
-## 2.1.0
+## 2.3.0
+
+* Update to Java8 thread safe time and date constructs.
+
+## 2.2.0
 
 * Additional Logback layout for use with e.g., Spring boot.
 
