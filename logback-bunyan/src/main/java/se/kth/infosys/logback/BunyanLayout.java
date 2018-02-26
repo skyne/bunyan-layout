@@ -2,12 +2,12 @@ package se.kth.infosys.logback;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +22,7 @@ import ch.qos.logback.core.LayoutBase;
 public class BunyanLayout extends LayoutBase<ILoggingEvent> {
     private static final Map<Level, Integer> BUNYAN_LEVEL;
     static {
-        BUNYAN_LEVEL = new HashMap<Level, Integer>();
+        BUNYAN_LEVEL = new HashMap<>();
         BUNYAN_LEVEL.put(Level.ERROR, 50);
         BUNYAN_LEVEL.put(Level.WARN, 40);
         BUNYAN_LEVEL.put(Level.INFO, 30);
@@ -30,16 +30,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         BUNYAN_LEVEL.put(Level.TRACE, 10);
     }
 
-    private static final TimeZone TZ = TimeZone.getTimeZone("UTC");
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static {
-        DATE_FORMAT.setTimeZone(TZ);
-    }
     private static final Gson GSON = new GsonBuilder().create();
-
-    private String getTime(long timeStamp) {
-        return DATE_FORMAT.format(new Date(timeStamp));
-    }
 
     @Override
     public String doLayout(ILoggingEvent event) {
@@ -53,7 +44,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
             jsonEvent.addProperty("hostname", "unkown");
         }
         jsonEvent.addProperty("pid", event.getThreadName());
-        jsonEvent.addProperty("time", getTime(event.getTimeStamp()));
+        jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeStamp()));
         jsonEvent.addProperty("msg", event.getFormattedMessage());
 
         if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableProxy() != null) {
@@ -63,14 +54,20 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
             jsonError.addProperty("message", e.getMessage());
             jsonError.addProperty("name", e.getClassName());
 
-            String stackTrace = "";
+            StringBuilder stackTrace = new StringBuilder();
             StackTraceElementProxy[] stackTraceElementProxyArray = e.getStackTraceElementProxyArray();
             for (StackTraceElementProxy element : stackTraceElementProxyArray) {
-                stackTrace += element.getStackTraceElement().toString() + '\n';
+                stackTrace.append(element.getStackTraceElement().toString()).append('\n');
             }
 
-            jsonError.addProperty("stack", stackTrace);
+            jsonError.addProperty("stack", stackTrace.toString());
             jsonEvent.add("err", jsonError);
         }
         return GSON.toJson(jsonEvent) + "\n";    }
+
+    private static String formatAsIsoUTCDateTime(long timeStamp) {
+        final Instant instant = Instant.ofEpochMilli(timeStamp);
+        return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_INSTANT);
+    }
 }
