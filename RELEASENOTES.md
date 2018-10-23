@@ -1,5 +1,9 @@
 # Releasenotes
 
+## 2.4.0
+
+* Use thread id for pid.
+
 ## 2.3.0
 
 * Update to Java8 thread safe time and date constructs.
