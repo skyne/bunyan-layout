@@ -43,7 +43,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         } catch (UnknownHostException e) {
             jsonEvent.addProperty("hostname", "unkown");
         }
-        jsonEvent.addProperty("pid", event.getThreadName());
+        jsonEvent.addProperty("pid", getThreadId(event));
         jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeStamp()));
         jsonEvent.addProperty("msg", event.getFormattedMessage());
 
@@ -65,9 +65,26 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         }
         return GSON.toJson(jsonEvent) + "\n";    }
 
+    private long getThreadId(ILoggingEvent event) {
+        long threadId;
+        String threadName = event.getThreadName();
+        if(Thread.currentThread().getName().equals(threadName)){
+            threadId = Thread.currentThread().getId();
+        } else {
+            try {
+                threadId = Long.parseLong(threadName.substring(threadName.lastIndexOf('-')));
+            } catch (NumberFormatException e) {
+                threadId = 0;
+            }
+        }
+        return threadId;
+    }
+
     private static String formatAsIsoUTCDateTime(long timeStamp) {
         final Instant instant = Instant.ofEpochMilli(timeStamp);
         return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
                 .format(DateTimeFormatter.ISO_INSTANT);
     }
+
+
 }

@@ -23,6 +23,13 @@
  */
 package se.kth.infosys.log4j;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
@@ -34,20 +41,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 /**
  * A Log4j 1.2 Layout which prints events in Node Bunyan JSON format.
  * The layout takes no options and requires no additional configuration.
  */
 public class BunyanLayout extends Layout {
     private static final Map<Level, Integer> BUNYAN_LEVEL;
+
     static {
         BUNYAN_LEVEL = new HashMap<>();
         BUNYAN_LEVEL.put(Level.FATAL, 60);
@@ -74,7 +74,7 @@ public class BunyanLayout extends Layout {
         } catch (UnknownHostException e) {
             jsonEvent.addProperty("hostname", "unkown");
         }
-        jsonEvent.addProperty("pid", event.getThreadName());
+        jsonEvent.addProperty("pid", getThreadId(event));
         jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeStamp()));
         jsonEvent.addProperty("msg", event.getMessage().toString());
         jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
@@ -120,5 +120,21 @@ public class BunyanLayout extends Layout {
     /**
      * No options, hence doing nothing.
      */
-    public void activateOptions() {}
+    public void activateOptions() {
+    }
+
+    private long getThreadId(LoggingEvent event) {
+        long threadId;
+        String threadName = event.getThreadName();
+        if (Thread.currentThread().getName().equals(threadName)) {
+            threadId = Thread.currentThread().getId();
+        } else {
+            try {
+                threadId = Long.parseLong(threadName.substring(threadName.lastIndexOf('-')));
+            } catch (NumberFormatException e) {
+                threadId = 0;
+            }
+        }
+        return threadId;
+    }
 }
