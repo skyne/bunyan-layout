@@ -67,7 +67,6 @@ public class BunyanLayout extends Layout {
         JsonObject jsonEvent = new JsonObject();
         jsonEvent.addProperty("v", 0);
         jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
-        jsonEvent.addProperty("levelStr", event.getLevel().toString());
         jsonEvent.addProperty("name", event.getLoggerName());
         try {
             jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
@@ -77,7 +76,6 @@ public class BunyanLayout extends Layout {
         jsonEvent.addProperty("pid", getThreadId(event));
         jsonEvent.addProperty("time", formatAsIsoUTCDateTime(event.getTimeStamp()));
         jsonEvent.addProperty("msg", event.getMessage().toString());
-        jsonEvent.addProperty("src", event.getLocationInformation().getClassName());
 
         if (event.getLevel().isGreaterOrEqual(Level.ERROR) && event.getThrowableInformation() != null) {
             JsonObject jsonError = new JsonObject();
