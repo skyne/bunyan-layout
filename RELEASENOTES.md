@@ -1,5 +1,9 @@
 # Releasenotes
 
+## 2.5.0
+
+* Remove redundant fields from log4j layout
+
 ## 2.4.0
 
 * Use thread id for pid.
