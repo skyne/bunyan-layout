@@ -39,3 +39,5 @@ git flow release finish x.y.z
 
 It is possible to publish the release branch `git flow release publish x.y.z` to the 
 repository if it is to be shared between developers or used in some CI environment.
+
+.
