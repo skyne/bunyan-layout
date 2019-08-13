@@ -37,6 +37,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         JsonObject jsonEvent = new JsonObject();
         jsonEvent.addProperty("v", 0);
         jsonEvent.addProperty("level", BUNYAN_LEVEL.get(event.getLevel()));
+        jsonEvent.addProperty("levelStr", event.getLevel().toString());
         jsonEvent.addProperty("name", event.getLoggerName());
         try {
             jsonEvent.addProperty("hostname", InetAddress.getLocalHost().getHostName());
