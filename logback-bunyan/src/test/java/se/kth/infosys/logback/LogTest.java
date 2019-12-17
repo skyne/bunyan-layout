@@ -16,10 +16,23 @@ public class LogTest {
         LOG.error("Error log");
 
         try {
-            throw new RuntimeException("A runtime exception");
+            throw new RuntimeException("A runtime exception", nestedException1());
         }
         catch (Exception e) {
             LOG.error("An exception", e);
         }
+    }
+
+    private RuntimeException nestedException1() {
+        try {
+            nestedException2();
+        } catch (RuntimeException e) {
+            return new RuntimeException("nested1", e);
+        }
+        return null;
+    }
+
+    private RuntimeException nestedException2() {
+        throw new RuntimeException("nested2");
     }
 }

@@ -1,5 +1,9 @@
 # Releasenotes
 
+## 2.6.0
+
+* Fix for logback logger so nested stacktraces are also logged
+
 ## 2.5.0
 
 * Remove redundant fields from log4j layout

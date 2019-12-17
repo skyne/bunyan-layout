@@ -1,5 +1,16 @@
 package se.kth.infosys.logback;
 
+import static java.util.Collections.singletonList;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.pattern.RootCauseFirstThrowableProxyConverter;
+import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.core.LayoutBase;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
@@ -9,17 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.StackTraceElementProxy;
-import ch.qos.logback.core.LayoutBase;
-
 public class BunyanLayout extends LayoutBase<ILoggingEvent> {
+
     private static final Map<Level, Integer> BUNYAN_LEVEL;
     static {
         BUNYAN_LEVEL = new HashMap<>();
@@ -31,6 +33,14 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
     }
 
     private static final Gson GSON = new GsonBuilder().create();
+    private ThrowableProxyConverter rtpc = new RootCauseFirstThrowableProxyConverter();
+
+    @Override
+    public void start() {
+        rtpc.setOptionList(singletonList("full"));
+        rtpc.start();
+        super.start();
+    }
 
     @Override
     public String doLayout(ILoggingEvent event) {
@@ -54,14 +64,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
 
             jsonError.addProperty("message", e.getMessage());
             jsonError.addProperty("name", e.getClassName());
-
-            StringBuilder stackTrace = new StringBuilder();
-            StackTraceElementProxy[] stackTraceElementProxyArray = e.getStackTraceElementProxyArray();
-            for (StackTraceElementProxy element : stackTraceElementProxyArray) {
-                stackTrace.append(element.getStackTraceElement().toString()).append('\n');
-            }
-
-            jsonError.addProperty("stack", stackTrace.toString());
+            jsonError.addProperty("stack", rtpc.convert(event));
             jsonEvent.add("err", jsonError);
         }
         return GSON.toJson(jsonEvent) + "\n";    }
