@@ -30,7 +30,7 @@ public class BunyanLayout extends LayoutBase<ILoggingEvent> {
         BUNYAN_LEVEL.put(Level.TRACE, 10);
     }
 
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
     @Override
     public String doLayout(ILoggingEvent event) {
